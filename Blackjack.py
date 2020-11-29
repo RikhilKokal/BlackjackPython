@@ -102,7 +102,8 @@ while chips > 0:
 				print()
 				print()
 				sleep(1)
-				if cards[0][1] == 10:
+
+				if cards[0][0] == 10:
 					chips += int(bet / 2)
 					dealerCards[0] = cards[0][2]
 					showHands(playerCardsShow, playerTotal)
@@ -115,6 +116,7 @@ while chips > 0:
 					print()
 					chips -= int(bet / 2)
 					break
+			
 			elif insurance.lower() == "n":
 				break
 			else:
