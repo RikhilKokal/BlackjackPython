@@ -14,7 +14,6 @@ def printWithEllipses(message):
 	for numOfDots in range(0,8):
 		print(f"\r{message}" + "." * (numOfDots % 4), end="   \b\b\b", flush = True)
 		sleep(0.5)
-	print()
 
 chips = 1000
 decks = None
@@ -71,7 +70,7 @@ clearScreen()
 while decks not in ["1", "2", "3", "4", "5", "6", "7", "8"]:
 	decks = input("How many decks of cards would you like to play with? (1-8)\n")
 	if decks not in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-		print("That is not an amount of decks you can play with.")
+		print("That is not an number of decks you can play with.")
 		
 decks = int(decks)
 if decks == 1:
@@ -98,7 +97,7 @@ while chips > 0:
 
 	# Asks how many chips the user wants to bet
 	while True:
-		bet = input(f"You have {int(chips)} chips. You can either enter the amount of chips you would like to bet or [E]xit.\n")
+		bet = input(f"You have {int(chips)} chips. Please enter the number of chips you want to bet or [E]xit.\n")
 		try:
 			bet = int(bet)
 		except ValueError:
@@ -106,7 +105,7 @@ while chips > 0:
 				exit = True
 				break
 			else:
-				print("That is not an amount of chips that you can bet.")
+				print("That is not a number of chips that you can bet.")
 				continue
 
 		if bet <= 0:
@@ -119,7 +118,7 @@ while chips > 0:
 
 	if exit is True:
 		while saveInput not in ["y", "n", "Y", "N"]:
-			saveInput = input("Would you like to save the amount of chips you have? (Y/N)\n")
+			saveInput = input("Would you like to save the number of chips you have? (Y/N)\n")
 			if saveInput.lower() == "y":
 				save = True
 			elif saveInput.lower() == "n":
@@ -454,29 +453,35 @@ while chips > 0:
 if save is True:
 	while username in scores or len(username) < 2:
 		if loadedUsername is True:
-			username = input("Please enter a username or [U]pdate using your current username.\n")
+			username = input("Would you like to [U]pdate using your current username or enter a [N]ew username?\n")
+			if username.lower() == "u":
+				username == enterUsername
+				break
+
+			if username.lower() == "n":
+				username = input("Please enter a username.\n")
+		
 		else:
 			username = input("Please enter a username.\n")
 		
-		if username.lower() == "u":
-			username == enterUsername
-			break
-		elif len(username) < 2:
+		if len(username) < 2:
 			print("Your username must be at least two characters.")
-		elif username in scores:
+		elif username in scores and username != enterUsername:
 			print("That username is already taken.")
 
 	scores[username] = chips
 	saveFile = open('BlackjackScores.dat', 'wb')
 	pickle.dump(scores, saveFile)
 	saveFile.close()
+	printWithEllipses(f"Saving username '{username}' and {chips} chips")
+	print("\r" + ' ' * (32 + len(username) + len(str(chips))), end = "\r")
+	print(f"Saved username '{username}' and {chips} chips!")
 
-elif exit is True:
-	print("Thank you for playing!")
-else:
+elif exit is not True:
 	print()
 	print("You have no more chips.")
 	if loadedUsername == True:
 		del scores[enterUsername]
-	sleep(1)
+
+sleep(1)
 print("Thank you for playing!")
