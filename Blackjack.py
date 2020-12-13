@@ -1,35 +1,114 @@
 from random import shuffle
 from time import sleep
 from os import system
+import platform
+import pickle
 
-system("clear")
+def clearScreen():
+	if platform.system() == 'Windows':
+		system("cls")
+	else:
+		system("clear")
+
+def printWithEllipses(message):
+	for numOfDots in range(0,8):
+		print(f"\r{message}" + "." * (numOfDots % 4), end="   \b\b\b", flush = True)
+		sleep(0.5)
+	print()
+
 chips = 1000
-
+decks = None
+save = None
+saveInput = None
+load = None
+loadedUsername = False
+username = ""
+enterUsername = None
+ableToSave = True
+exit = False
 cardNames = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King", "Ace"]
 suits = ["Clubs", "Diamonds", "Hearts", "Spades"]
+
+try:
+	loadFile = open('BlackjackScores.dat', 'rb')
+	scores = pickle.load(loadFile)
+	loadFile.close()
+
+except EOFError:
+	scores = {}
+
+except FileNotFoundError:
+	loadFile = open('BlackjackScores.dat', 'x')
+	scores = {}
+	loadFile.close()
+
+clearScreen()
+
+if ableToSave is True:
+	if len(scores) != 0:
+		while load not in ["y", "n", "Y", "N"]:
+			load = input(f"You have {len(scores)} saved game(s). Would you like to load that save file? (Y/N)\n")
+			if load.lower() == "y":
+				while enterUsername not in scores:
+					enterUsername = input("What is your username?\n")
+					scores.get(enterUsername)
+					
+					if enterUsername not in scores:
+						print("That username has not been saved.")
+				
+				chips = scores[enterUsername]
+				loadedUsername = True
+				printWithEllipses("Loading save file")
+			
+			elif load.lower() == "n":
+				pass
+			
+			else:
+				print("Unknown command entered. Please try again.")
+
+clearScreen()
+
+while decks not in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+	decks = input("How many decks of cards would you like to play with? (1-8)\n")
+	if decks not in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+		print("That is not an amount of decks you can play with.")
+		
+decks = int(decks)
+if decks == 1:
+	printWithEllipses("Shuffling a deck of cards")
+else:
+	printWithEllipses(f"Shuffling {decks} decks of cards")
+	
+clearScreen()
 
 while chips > 0:
 	# Creates a list of 52 lists, each of the nested lists has three elements: the card value, the card name, and what is printed to the user, respectively
 	cards = []
-	for cardName in cardNames:
-		for suit in suits:
-			if type(cardName) == int:
-				cards.append([cardName, cardName, f"{cardName}{suit}"])
-			elif cardName == "Ace":
-				cards.append([11, cardName, f"{cardName}{suit}"])
-			else:
-				cards.append([10, cardName, f"{cardName}{suit}"])
+	for i in range(0, decks):
+		for cardName in cardNames:
+			for suit in suits:
+				if type(cardName) == int:
+					cards.append([cardName, cardName, f"{cardName}{suit}"])
+				elif cardName == "Ace":
+					cards.append([11, cardName, f"{cardName}{suit}"])
+				else:
+					cards.append([10, cardName, f"{cardName}{suit}"])
 
 	shuffle(cards)
 
 	# Asks how many chips the user wants to bet
 	while True:
-		bet = input(f"You have {int(chips)} chips. How many would you like to bet?\n")
+		bet = input(f"You have {int(chips)} chips. You can either enter the amount of chips you would like to bet or [E]xit.\n")
 		try:
 			bet = int(bet)
 		except ValueError:
-			print("That is not an amount of chips that you can bet.")
-			continue
+			if bet.lower() == "e":
+				exit = True
+				break
+			else:
+				print("That is not an amount of chips that you can bet.")
+				continue
+
 		if bet <= 0:
 			print("You must bet at least one chip.")
 		elif bet > chips:
@@ -37,6 +116,17 @@ while chips > 0:
 		elif bet <= chips:
 			print()
 			break
+
+	if exit is True:
+		while saveInput not in ["y", "n", "Y", "N"]:
+			saveInput = input("Would you like to save the amount of chips you have? (Y/N)\n")
+			if saveInput.lower() == "y":
+				save = True
+			elif saveInput.lower() == "n":
+				save = False
+			else:
+				print("Unknown command entered. Please try again.")
+		break
 
 	playerCards = [cards[2], cards[3]]
 	playerCardsShow = [cards[2][2], cards[3][2]]
@@ -47,6 +137,7 @@ while chips > 0:
 	playerSplit = False
 	splitTurn = False
 	playerCardsSplit = []
+	playerCardsSplitShow = []
 	double1 = False
 	double2 = False
 	
@@ -132,11 +223,12 @@ while chips > 0:
 
 	# Asks the player wants to hit or stay until the player chooses stay or busts
 	while True:
-		if split == True:
+		if split is True:
 			turn = 1
 			splitTurn = True
 			playerTotalSplit = playerTotal
-			playerCardsSplit = playerCardsShow
+			playerCardsSplit = playerCards
+			playerCardsSplitShow = playerCardsShow
 			playerCards = [cards[3], cards[5]]
 			playerCardsShow = [playerCards[0][2], playerCards[1][2]]
 			playerTotal = playerCards[0][0] + playerCards[1][0]
@@ -150,11 +242,12 @@ while chips > 0:
 			showHands(playerCardsShow, playerTotal)
 			split = False
 			continue
+
 		double = False
 		if playerTotal > 21:
 			print("You bust.")
 
-			if playerSplit is True and splitTurn == False:
+			if playerSplit is True and splitTurn is False:
 				split = True
 				continue
 			else:
@@ -162,7 +255,7 @@ while chips > 0:
 				break
 
 		elif playerTotal == 21:
-			if playerSplit is True and splitTurn == False:
+			if playerSplit is True and splitTurn is False:
 				split = True
 				continue
 			else:
@@ -170,9 +263,11 @@ while chips > 0:
 				break
 
 		elif turn == 1 and (bet * 2) <= chips:
-			if playerCards[0][1] == playerCards[1][1] and playerSplit == False:
+			if playerCards[0][1] == playerCards[1][1] and playerSplit is False:
 				hitOrStay = input("Would you like to [H]it, [S]tay, [D]ouble Down, or [Sp]lit?\n")
 				if hitOrStay.lower() == "sp":
+					if cards[3][0] == 1:
+						cards[3][0] = 11
 					playerCards = [cards[2], cards[4]]
 					playerCardsShow = [playerCards[0][2], playerCards[1][2]]
 					playerTotal = playerCards[0][0] + playerCards[1][0]
@@ -200,9 +295,14 @@ while chips > 0:
 			playerCards.append(cards[cardCount])
 
 			for card in range(len(playerCards)):
-				if playerCards[card][0] == 11 and playerTotal > 21:
-					playerCards[card][0] = 1
-					playerTotal -= 10
+				if playerSplit is True and splitTurn is True:
+					if playerCardsSplit[card][0] == 11 and playerTotal > 21:
+						playerCardsSplit[card][0] = 1
+						playerTotal -= 10
+				else:
+					if playerCards[card][0] == 11 and playerTotal > 21:
+						playerCards[card][0] = 1
+						playerTotal -= 10
 			
 			print(f"Your new total is: {playerTotal}.")
 			cardCount += 1
@@ -210,7 +310,7 @@ while chips > 0:
 			if double is True:
 				if playerTotal > 21:
 					print("You bust.")
-				if playerSplit is True and splitTurn == False:
+				if playerSplit is True and splitTurn is False:
 					double1 = True
 					split = True
 					continue
@@ -222,7 +322,7 @@ while chips > 0:
 					break
 
 		elif hitOrStay.lower() == "s":
-			if playerSplit is True and splitTurn == False:
+			if playerSplit is True and splitTurn is False:
 				split = True
 				continue
 			else:
@@ -243,7 +343,7 @@ while chips > 0:
 	print()
 	print()
 	if playerSplit is True:
-		showHands(playerCardsSplit, playerTotalSplit)
+		showHands(playerCardsSplitShow, playerTotalSplit)
 		showPlayerHand(playerCardsShow, playerTotal)
 	else:
 		showHands(playerCardsShow, playerTotal)
@@ -260,8 +360,8 @@ while chips > 0:
 						dealerTotal += cards[cardCount][0]
 						dealerCards.append(cards[card][2])
 
-						for card in range(len(dealerCards) + len(playerCards) + len(playerCardsSplit)):
-							if cards[card][2] not in playerCardsShow and cards[card][2] not in playerCardsSplit:
+						for card in range(len(dealerCards) + len(playerCards) + len(playerCardsSplitShow)):
+							if cards[card][2] not in playerCardsShow and cards[card][2] not in playerCardsSplitShow:
 								if cards[card][0] == 11 and dealerTotal > 21:
 									cards[card][0] = 1
 									dealerTotal -= 10
@@ -327,7 +427,7 @@ while chips > 0:
 		print()
 		print("HAND 1")
 		print()
-		showHands(playerCardsSplit, playerTotalSplit)
+		showHands(playerCardsSplitShow, playerTotalSplit)
 		if double1 is True:
 			whoWins(playerTotalSplit, double1)
 		else:
@@ -351,5 +451,32 @@ while chips > 0:
 	print()
 	sleep(1)
 
-print()
-print("You have no more chips.")
+if save is True:
+	while username in scores or len(username) < 2:
+		if loadedUsername is True:
+			username = input("Please enter a username or [U]pdate using your current username.\n")
+		else:
+			username = input("Please enter a username.\n")
+		
+		if username.lower() == "u":
+			username == enterUsername
+			break
+		elif len(username) < 2:
+			print("Your username must be at least two characters.")
+		elif username in scores:
+			print("That username is already taken.")
+
+	scores[username] = chips
+	saveFile = open('BlackjackScores.dat', 'wb')
+	pickle.dump(scores, saveFile)
+	saveFile.close()
+
+elif exit is True:
+	print("Thank you for playing!")
+else:
+	print()
+	print("You have no more chips.")
+	if loadedUsername == True:
+		del scores[enterUsername]
+	sleep(1)
+print("Thank you for playing!")
