@@ -459,10 +459,10 @@ if save is True:
 				break
 
 			if username.lower() == "n":
-				username = input("Please enter a username.\n")
+				username = input("Please enter a username. Please remember this username to load this save file.\n")
 		
 		else:
-			username = input("Please enter a username.\n")
+			username = input("Please enter a username. Please remember this username to load this save file.\n")
 		
 		if len(username) < 2:
 			print("Your username must be at least two characters.")
@@ -475,7 +475,7 @@ if save is True:
 	saveFile.close()
 	printWithEllipses(f"Saving username '{username}' and {chips} chips")
 	print("\r" + ' ' * (32 + len(username) + len(str(chips))), end = "\r")
-	print(f"Saved username '{username}' and {chips} chips!")
+	print(f"Saved!")
 
 elif exit is not True:
 	print()
