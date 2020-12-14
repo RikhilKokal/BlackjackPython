@@ -459,10 +459,10 @@ if save is True:
 				break
 
 			if username.lower() == "n":
-				username = input("Please enter a username. Please remember this username to load this save file.\n")
+				username = input("Please enter a username and remember it in order to load this save file.\n")
 		
 		else:
-			username = input("Please enter a username. Please remember this username to load this save file.\n")
+			username = input("Please enter a username and remember it in order to load this save file.\n")
 		
 		if len(username) < 2:
 			print("Your username must be at least two characters.")
