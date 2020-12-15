@@ -480,7 +480,7 @@ if save is True:
 elif exit is not True:
 	print()
 	print("You have no more chips.")
-	if loadedUsername == True:
+	if loadedUsername is True:
 		del scores[enterUsername]
 
 sleep(1)
