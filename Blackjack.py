@@ -456,12 +456,10 @@ while chips > 0:
 if save is True:
 	while username in scores or len(username) < 2:
 		if loadedUsername is True:
-			username = input("Would you like to [U]pdate using your current username or enter a [N]ew one?\n")
-			if username.lower() == "u":
 				username = enterUsername
 				break
-		
-		if loadedUsername is False or username.lower() == "n":
+
+		else:
 			username = input("Please enter a username and remember it in order to load this save file.\n")
 		
 		if len(username) < 2:
@@ -473,9 +471,13 @@ if save is True:
 	saveFile = open('BlackjackScores.dat', 'wb')
 	pickle.dump(scores, saveFile)
 	saveFile.close()
-	printWithEllipses(f"Saving username '{username}' and {chips} chips")
-	print("\r" + ' ' * (32 + len(username) + len(str(chips))), end = "\r")
-	print(f"Saved!")
+	if loadedUsername is True:
+		printWithEllipses(f"Updating username '{username}' with {chips} chips")
+	else:
+		printWithEllipses(f"Saving username '{username}' and {chips} chips")
+	
+	print("\r" + ' ' * (35 + len(username) + len(str(chips))), end = "\r")
+	print("Saved!")
 
 elif exit is not True:
 	print()
