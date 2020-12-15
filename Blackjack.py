@@ -117,14 +117,17 @@ while chips > 0:
 			break
 
 	if exit is True:
-		while saveInput not in ["y", "n", "Y", "N"]:
-			saveInput = input("Would you like to save the number of chips you have? (Y/N)\n")
-			if saveInput.lower() == "y":
-				save = True
-			elif saveInput.lower() == "n":
-				save = False
-			else:
-				print("Unknown command entered. Please try again.")
+		if loadedUsername is True:
+			save = True
+		else:
+			while saveInput not in ["y", "n", "Y", "N"]:
+				saveInput = input("Would you like to save the number of chips you have? (Y/N)\n")
+				if saveInput.lower() == "y":
+					save = True
+				elif saveInput.lower() == "n":
+					save = False
+				else:
+					print("Unknown command entered. Please try again.")
 		break
 
 	playerCards = [cards[2], cards[3]]
@@ -453,15 +456,12 @@ while chips > 0:
 if save is True:
 	while username in scores or len(username) < 2:
 		if loadedUsername is True:
-			username = input("Would you like to [U]pdate using your current username or enter a [N]ew username?\n")
+			username = input("Would you like to [U]pdate using your current username or enter a [N]ew one?\n")
 			if username.lower() == "u":
-				username == enterUsername
+				username = enterUsername
 				break
-
-			if username.lower() == "n":
-				username = input("Please enter a username and remember it in order to load this save file.\n")
 		
-		else:
+		if loadedUsername is False or username.lower() == "n":
 			username = input("Please enter a username and remember it in order to load this save file.\n")
 		
 		if len(username) < 2:
