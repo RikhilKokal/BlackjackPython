@@ -23,7 +23,6 @@ load = None
 loadedUsername = False
 username = ""
 enterUsername = None
-ableToSave = True
 exit = False
 cardNames = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King", "Ace"]
 suits = ["Clubs", "Diamonds", "Hearts", "Spades"]
@@ -43,27 +42,26 @@ except FileNotFoundError:
 
 clearScreen()
 
-if ableToSave is True:
-	if len(scores) != 0:
-		while load not in ["y", "n", "Y", "N"]:
-			load = input(f"You have {len(scores)} saved game(s). Would you like to load that save file? (Y/N)\n")
-			if load.lower() == "y":
-				while enterUsername not in scores:
-					enterUsername = input("What is your username?\n")
-					scores.get(enterUsername)
-					
-					if enterUsername not in scores:
-						print("That username has not been saved.")
+if len(scores) != 0:
+	while load not in ["y", "n", "Y", "N"]:
+		load = input(f"You have {len(scores)} saved game(s). Would you like to load that save file? (Y/N)\n")
+		if load.lower() == "y":
+			while enterUsername not in scores:
+				enterUsername = input("What is your username?\n")
+				scores.get(enterUsername)
 				
-				chips = scores[enterUsername]
-				loadedUsername = True
-				printWithEllipses("Loading save file")
+				if enterUsername not in scores:
+					print("That username has not been saved.")
 			
-			elif load.lower() == "n":
-				pass
-			
-			else:
-				print("Unknown command entered. Please try again.")
+			chips = scores[enterUsername]
+			loadedUsername = True
+			printWithEllipses("Loading save file")
+		
+		elif load.lower() == "n":
+			pass
+		
+		else:
+			print("Unknown command entered. Please try again.")
 
 clearScreen()
 
