@@ -482,6 +482,9 @@ elif exit is not True:
 	print("You have no more chips.")
 	if loadedUsername is True:
 		del scores[enterUsername]
+	saveFile = open('BlackjackScores.dat', 'wb')
+	pickle.dump(scores, saveFile)
+	saveFile.close()
 
 sleep(1)
 print("Thank you for playing!")
